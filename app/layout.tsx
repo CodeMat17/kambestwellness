@@ -65,6 +65,9 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  verification: {
+    google: "fDOJsJOD8ZPgJSRLgSlH1X_X_PrIKW2JlBpKExOu-VA",
+  },
   formatDetection: {
     telephone: false,
     address: false,
@@ -96,6 +99,32 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'AW-18455895695');
+          `}
+        </Script>
+        {/* Google Ads conversion: fired on every WhatsApp and phone link click.
+            No URL is passed, so links keep their normal behaviour (new tab /
+            dialer) instead of being redirected from the event callback. */}
+        <Script id="google-ads-conversion" strategy="afterInteractive">
+          {`
+            function gtag_report_conversion(url) {
+              var callback = function () {
+                if (typeof(url) != 'undefined') {
+                  window.location = url;
+                }
+              };
+              gtag('event', 'conversion', {
+                'send_to': 'AW-18455895695/bIyvCJS6nLEdEI-9uuBE',
+                'value': 1.0,
+                'currency': 'USD',
+                'event_callback': callback
+              });
+              return false;
+            }
+            window.gtag_report_conversion = gtag_report_conversion;
+            document.addEventListener('click', function (e) {
+              var link = e.target.closest && e.target.closest('a[href^="https://wa.me/"], a[href^="tel:"]');
+              if (link) gtag_report_conversion();
+            });
           `}
         </Script>
       </body>
